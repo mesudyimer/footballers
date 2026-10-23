@@ -1,0 +1,17 @@
+.container{
+    text-align: center;
+    padding: 5px;
+    
+}
+ul{
+    list-style-type: none;
+   font-size: 25px;
+
+}
+.fail{
+    text-align: center;
+    color: red;
+}
+li{
+    padding: 5px 0;
+}
