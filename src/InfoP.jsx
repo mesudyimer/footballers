@@ -1,39 +1,63 @@
 import React from 'react'
 import  './index.css'
 import useDebounce from './useDebounce';
-import footballers from './footballers';
 import { useState,useEffect } from 'react';
 const InfoP = () => {
     const[query,setquery]=useState("");
     const[result,setresult]=useState([])
     const debounce=useDebounce(query,1000)
     useEffect(()=>{
+        async function getplayer(){
         if(debounce){
-            const Fresult=footballers.filter(footballer=>(footballer.name.toLocaleLowerCase().includes(debounce.toLocaleLowerCase())))
-            setresult(Fresult)
-        }
-        else{
-            setresult([])
-        }
+            try{
+            const res=await fetch(`https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=${debounce}`)
+            if(!res.ok){
+                throw new Error("cant fetch data"); 
+            }
+
+           const property= await res.json();
+           console.log(property)
+        setresult(property.player||[])
+    }catch(error){
+    console.error(error.message)
+}
+       
+    }
+}
+      getplayer();  
     },[debounce])
+
+    
   return (
    <>
-   <h1 style={{textAlign:"center"}}>Footballer Search App</h1>
+   <h1 style={{textAlign:"center", color:"white", textShadow: "2px 2px 4px rgba(0,0,0,0.8)"}}>Footballer Search App</h1>
    <div style={{textAlign:"center"}}>
-    <input style={{padding:"5px",width:"30%"}} 
-    type='text'
+    <input style={{width:"30%" }} 
+    type='search'
     value={query}
-    onChange={(e)=>setquery(e.target.value)}>
+    onChange={(e)=>setquery(e.target.value)}
+    placeholder='Search for a sports star...'>
     </input>
    </div>
    {result.length>0&&(
     <div className='container'>
-        <h2>Result</h2>
+        <h2 style={{color:"white", fontSize:"40px"}}>Result</h2>
         <ul>
-            {result.map((player)=>
-            (<li key={player.id}>Name:{player.name} 
-            <li>Age:{player.age}</li> 
-            Position:{player.position}</li>))}
+            {
+result.map((player) => (
+    <li key={player.idPlayer}>
+        <p>Name: {player.strPlayer}</p>
+        <p>Date of birth: {player.dateBorn}</p>
+        <p>Gender: {player.strGender}</p>
+        <p>Nationality: {player.strNationality}</p>
+        <p>Sport: {player.strSport}</p>
+        <p>Status: {player.strStatus}</p>
+        <p>Position: {player.strPosition}</p>
+        <p>Team: {player.strTeam || "Unknown"}</p>
+    </li>
+))
+
+}
         </ul>
     </div>
    )}
